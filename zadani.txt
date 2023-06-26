@@ -1,0 +1,101 @@
+Bomber Man Game
+
+I choose bomber man game.
+
+Polymorphism design and exact task specification are below.
+
+The implementation diagrams are shown index.html in doc directory or run $ make doc.
+
+
+# exact task specification
+I made bomberman game. the library are used SDL2.
+
+### PLAY MODE
+First of all, players can select from several play modes:
+
+* Single Player mode with extra enemies
+* MultiPlayer mode
+
+After choose the map will loaded from file in assets folder.
+
+### PLAYING
+Player A can move using the 'W', 'A', 'S', and 'D' keys on the keyboard and can drop a bomb using the 'C' key. 
+After constant second, the bomb will explode, sending a blast in a cross shape to a neighbor one block,
+and player can set bomb again by default.
+
+Similarly, Player B can move using the 'Up', 'Left', 'Down', and 'Right' keys, and can drop a bomb using the 'SLASH' key.
+
+Players can earn points throughout the game by destroying objects:
+
+* Breakable Wall: 5 points.
+* Extra Enemy: 10 points.
+* Other Player: 50 points.
+* Item: 10 points.
+
+Current points are shown in upper side of window. and best results are shown at upper left side.
+
+### ITEMS (Bonuses)
+There are some items, it is hidden under the breakblewalls:
+
+* unlimited_blast
+By default, the blast spread only extends to 1 block. However, a player with this item can spread the blast unlimitedly, meaning it will continue until it hits the object.
+
+* Unlimited Bombs
+By default, a player can only drop another bomb after the previously dropped bomb has exploded. But with this item, a player can drop bombs without any time restrictions.
+
+* Remote control
+Player can trigger the exprosion of bomb after spend bomb cycle, or if player has Unlimited Bombs, player can trigger exprosion any time for one bomb.
+
+those two item can holds simultaniously.
+
+When all player is destroyed, game ends.
+
+After the end of game, the Game conclusion is shown.
+
+In this window, the points of each player got is shown, and top 5 records from file and this game is shown.
+Thus player known rank 1 to 5 or below than 5.  
+
+In this window, Player can choose retry the game or quit the game.
+If it is quit, quit the game, close window.
+if it is retry, player can again choose Play mode and play. and so on.
+
+Game objects are implement by using plymorphism.
+
+# polymorphism design
+
+The diagrams of polymorphisms are shown by doxygen those are in doc/html/index.html or run $ make doc.
+
+I utilized polymorphism in the design of game objects.
+
+### CObj base class
+The base class "CObj" represents a game object, and is inherited by various child classes that represent specific game objects.  such that,  "CMovable" ,"Wall", "BreakableWall", "Bomb", "Blast" and "Item".
+
+### Virtual methods
+
+Each game object has "init", "update", "collision", methods. These methods are virtual in the "CObj" class and are overridden in the child classes to provide specific behaviors. 
+
+#### constructor
+the constructor of the base class stores the rectangle information of the object and sets the default value to other members. And each child class has its own constructor.
+
+#### init function
+The "init" function is used to setting their texture to an object mainly and used to initialize object.
+
+#### update function.
+The "update" function updates the object state.
+e.g. object belongs to a bomb, calculates life time then if it exceeds then destroy itself.
+
+
+### CMovable is base class and inherited from CObj
+
+The CMovable class has child classes, "Player" and "ExtraEnemy". These class objects can move, and since this functionality is common to both classes, it's managed by CMovable. Specifically, the members m_next and m_prev_pos manage the next and previous positions. These are used by the NextMove() method and the overridden update() method.
+
+
+### Double Dispatch
+
+The collisions are managed within each object. All objects are stored in a vector of shared pointers to CObj objects. Therefore, in order to call the corresponding overridden method, we need to use this technique.
+void collision(CObj& other)  {other.collision(*this);}
+
+This method is used to call the corresponding method with the derived type as an argument. Since (*this) refers to an object of the derived type.
+
+More detail description and examples are in examples/Objects.test.cpp
+
